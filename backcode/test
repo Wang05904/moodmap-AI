@@ -1,0 +1,38 @@
+// test/sentiment.test.js
+const { analyzeSentiment } = require('../utils/sentimentAl');
+
+// 模拟延迟，避免频繁调用
+jest.setTimeout(10000);
+
+describe('情绪分析模块测试', () => {
+  test('正面情绪应返回 4 或 5', async () => {
+    const result = await analyzeSentiment('今天天气真好，我好开心啊！');
+    expect(result).toBeGreaterThanOrEqual(4);
+  });
+
+  test('负面情绪应返回 1 或 2', async () => {
+    const result = await analyzeSentiment('好累啊，什么都不想做，心情很差。');
+    expect(result).toBeLessThanOrEqual(2);
+  });
+
+  test('中性情绪应返回 3', async () => {
+    const result = await analyzeSentiment('今天上班了，吃了午饭。');
+    expect(result).toBe(3);
+  });
+
+  test('含表情符号的文本也能正确分析', async () => {
+    const result = await analyzeSentiment('终于放假啦 😊 太开心了！');
+    expect(result).toBe(5);
+  });
+
+  test('长文本也能处理', async () => {
+    const longText = '最近工作压力很大，项目进度紧张，每天加班到很晚，感觉身心俱疲...但周末和朋友去爬山，呼吸新鲜空气，心情稍微好了一些。';
+    const result = await analyzeSentiment(longText);
+    expect([1, 2, 3]).toContain(result); // 可能偏负面或中性
+  });
+
+  test('空文本或无效输入返回默认值 3', async () => {
+    const result = await analyzeSentiment('');
+    expect(result).toBe(3);
+  });
+});
